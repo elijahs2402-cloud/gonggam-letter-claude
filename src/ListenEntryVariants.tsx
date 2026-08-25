@@ -146,7 +146,7 @@ function ListenEntryFrame({
   function meetLetter() {
     if (state === "loading") return;
     setState("loading");
-    timerRef.current = window.setTimeout(() => goTo("/waiting-letters"), 2000);
+    timerRef.current = window.setTimeout(() => goTo("/read-letter/sample-waiting-letter-one"), 2000);
   }
 
   const content =

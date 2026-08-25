@@ -383,12 +383,64 @@ export function LetterWithdrawnScreen({ letterId }: { letterId?: string }) {
   return <FocusShell title="편지 거두기" fallback="/home"><section className="flow-complete"><h1>편지를 조용히 거두었어요</h1><p>이 편지는 더 이상 새로운 사람에게 보이지 않아요.</p><div><button className="flow-primary-button" type="button" onClick={() => navigateTo(`/mailbox/my/${encodeURIComponent(letter.id)}`)}>편지함에 보관하기</button><button className="flow-text-button" type="button" onClick={() => navigateTo("/home")}>홈으로 돌아가기</button></div></section></FocusShell>;
 }
 
+/** 읽기 공간형 편지 카드: /read-letter 의 방 일러스트 + 겹쳐지는 편지지·큰 따옴표 스타일을 내 편지 상세에 그대로 적용 */
 export function MyLetterDetailScreen({ letterId }: { letterId?: string }) {
   const letter = letterId ? getLetterById(letterId) : undefined;
   if (!letter || letter.senderId !== getCurrentUserId()) return <MissingLetterScreen />;
-  const userId = getCurrentUserId(); const params = getCurrentAppSearchParams(); const showReply = params.get("reply") === "1" || Boolean(params.get("excerpt")); const replyHidden = Boolean(letter.reply && isContentHidden(userId, "reply", letter.reply.id)); const replyBlocked = Boolean(letter.reply && isUserBlocked(userId, letter.reply.writerId)); const focusExcerptId = params.get("excerpt") ?? undefined; const display = getSentLetterDisplayStatus(letter, userId);
+  const userId = getCurrentUserId();
+  const display = getSentLetterDisplayStatus(letter, userId);
+  const signature = letter.anonymousName || getCurrentAnonymousName();
   if (display.isDeleted) return <FocusShell title="내가 보낸 편지" fallback="/mailbox"><section className="flow-message"><h1>이 편지를 찾을 수 없어요.</h1><p>삭제되었거나 더 이상 접근할 수 없는 기록이에요.</p><button className="flow-primary-button" type="button" onClick={() => navigateTo("/mailbox")}>편지함으로 돌아가기</button></section></FocusShell>;
-  return <FocusShell title="내가 보낸 편지" fallback="/mailbox"><section className="letter-detail"><p className="detail-kicker">내가 보낸 편지</p><article className="flow-letter-paper"><blockquote>{letter.content}</blockquote></article><section className="detail-status-card"><strong>{display.label}</strong><p>{display.description}</p>{!display.isRestricted && !display.isDeleted && <button className="flow-secondary-button" type="button" onClick={() => navigateTo(display.kind === "delayed" ? `/letter-delay/${encodeURIComponent(letter.id)}` : `/letter-journey/${encodeURIComponent(letter.id)}`)}>{display.kind === "delayed" ? "기다림에 대해 살펴보기" : "편지의 여정 보기"}</button>}</section><dl><div><dt>현재 상태</dt><dd>{display.label}</dd></div><div><dt>보낸 날짜</dt><dd>{formatDate(letter.createdAt)}</dd></div>{letter.reply && <div><dt>답장 도착 날짜</dt><dd>{letter.repliedAt ? formatDate(letter.repliedAt) : "답장을 받았어요"}</dd></div>}</dl>{letter.reply ? (showReply ? <section className="detail-reply"><p>받은 답장 <button className="reply-more-button" type="button" onClick={() => navigateTo(`/report-reply/${encodeURIComponent(letter.id)}`)}>⋯</button></p>{replyBlocked ? <div className="content-restricted"><strong>차단한 사용자의 콘텐츠예요.</strong><span>안전을 위해 이 내용은 기본적으로 숨겨져 있어요.</span><button type="button" onClick={() => navigateTo("/safety-management")}>안전 관리에서 확인</button></div> : replyHidden ? <div className="content-restricted"><strong>숨긴 답장이에요.</strong><span>필요하면 다시 펼쳐볼 수 있어요.</span><button type="button" onClick={() => { revealContent(userId, "reply", letter.reply!.id); window.location.reload(); }}>답장 다시 보기</button><button type="button" onClick={() => navigateTo("/mailbox")}>편지함으로 돌아가기</button></div> : <><SealedReply letterId={letter.id} replyId={letter.reply.id} ownerId={userId} content={letter.reply.content} focusExcerptId={focusExcerptId} /><small>익명의 누군가 · {formatDate(letter.reply.createdAt)}</small><button className="detail-gratitude-button" type="button" onClick={() => navigateTo(`/gratitude/${encodeURIComponent(letter.id)}`)}>고마움 전하기</button></>}</section> : <section className="detail-reply-arrival"><strong>{display.hasUnreadReply ? "답장이 도착했어요." : "답장을 받았어요."}</strong><p>{display.hasUnreadReply ? "당신의 편지를 읽은 사람이 마음을 전했어요." : "도착한 답장을 다시 읽을 수 있어요."}</p><button className="flow-primary-button" type="button" onClick={() => navigateTo(display.hasUnreadReply ? `/reply-arrived/${encodeURIComponent(letter.id)}` : `/mailbox/my/${encodeURIComponent(letter.id)}?reply=1`)}>{display.hasUnreadReply ? "답장 읽기" : "받은 답장 보기"}</button></section>) : display.isRestricted ? <p className="detail-waiting">현재 이 편지의 내용을 확인할 수 없어요.</p> : letter.status === "withdrawn" ? <p className="detail-waiting">이 편지는 조용히 거두었어요</p> : <><p className="detail-waiting">{display.description}</p>{display.kind === "delayed" && <button className="flow-text-button" type="button" onClick={() => navigateTo(`/letter-delay/${encodeURIComponent(letter.id)}`)}>답장이 늦어질 때 할 수 있는 일</button>}</>}</section></FocusShell>;
+  if (letter.reply) {
+    const replyBlocked = isUserBlocked(userId, letter.reply.writerId);
+    const replyHidden = isContentHidden(userId, "reply", letter.reply.id);
+    if (replyBlocked || replyHidden) return <FocusShell title="내가 보낸 편지" fallback="/mailbox"><section className="letter-detail"><p className="detail-kicker">내가 보낸 편지</p><article className="flow-letter-paper"><blockquote>{letter.content}</blockquote></article>{replyBlocked ? <div className="content-restricted"><strong>차단한 사용자의 콘텐츠예요.</strong><span>안전을 위해 이 내용은 기본적으로 숨겨져 있어요.</span><button type="button" onClick={() => navigateTo("/safety-management")}>안전 관리에서 확인</button></div> : <div className="content-restricted"><strong>숨긴 답장이에요.</strong><span>필요하면 다시 펼쳐볼 수 있어요.</span><button type="button" onClick={() => { revealContent(userId, "reply", letter.reply!.id); window.location.reload(); }}>답장 다시 보기</button></div>}</section></FocusShell>;
+    if (display.hasUnreadReply) markReplyOpened(letter.id, userId);
+    return <main className="mobile-prototype letter-flow-screen letter-flow-screen--active-reader"><FlowHeader title="내가 보낸 편지" fallback="/mailbox" /><div className="letter-flow-scroll active-reading-scroll">
+      <section className="active-reading-room" aria-label="내가 보낸 편지 공간" style={{ minHeight: 248 }}>
+        <div className="active-reading-room-copy"><h1>내 마음에<br /><strong>답장</strong>이 도착했어요</h1></div>
+        <img src="/assets/reply-sent-lavender-envelope.png" alt="" aria-hidden="true" style={{ opacity: 1, bottom: 12 }} />
+      </section>
+      <p className="active-reading-kicker" style={{ margin: "0 0 14px", padding: "0 24px" }}><span>내가 보낸 편지</span><time>{formatDate(letter.createdAt)}</time></p>
+      <div className="active-reading-mat" style={{ marginTop: 0 }}>
+        <article className="active-reading-paper" style={{ minHeight: "auto", paddingBottom: 26 }}>
+          <span className="active-reading-quote active-reading-quote--open" aria-hidden="true" style={{ color: "rgba(41,37,34,0.6)" }}>“</span>
+          <blockquote style={{ minHeight: "auto" }}>{letter.content}</blockquote>
+          <span className="active-reading-quote active-reading-quote--close" aria-hidden="true" style={{ color: "rgba(41,37,34,0.6)" }}>”</span>
+          <p style={{ margin: "10px 0 0", textAlign: "right", color: "var(--muted-ink)", fontFamily: '"Noto Serif KR", serif', fontSize: "12px" }}>─ {signature}</p>
+        </article>
+      </div>
+      <div style={{ display: "flex", justifyContent: "center", padding: "30px 0" }}>
+        <span aria-hidden="true" style={{ width: 1, height: 44, background: "rgba(188, 146, 62, 0.68)" }} />
+      </div>
+      <p className="active-reading-kicker" style={{ margin: "0 0 14px", padding: "0 24px" }}><span>받은 답장</span><time>{formatDate(letter.reply.createdAt)}</time></p>
+      <div className="active-reading-mat" style={{ marginTop: 0 }}>
+        <article className="active-reading-paper" style={{ minHeight: "auto", paddingBottom: 26, background: "rgba(232,222,239,.32)", borderColor: "rgba(104,78,126,.32)" }}>
+          <span className="active-reading-quote active-reading-quote--open" aria-hidden="true">“</span>
+          <blockquote style={{ minHeight: "auto" }}>{letter.reply.content}</blockquote>
+          <span className="active-reading-quote active-reading-quote--close" aria-hidden="true">”</span>
+          <p style={{ margin: "10px 0 0", textAlign: "right", color: "var(--muted-ink)", fontFamily: '"Noto Serif KR", serif', fontSize: "12px" }}>─ 익명의 누군가</p>
+        </article>
+      </div>
+    </div></main>;
+  }
+  if (display.isRestricted) return <FocusShell title="내가 보낸 편지" fallback="/mailbox"><section className="flow-message"><h1>현재 이 편지를<br />확인할 수 없어요.</h1><p>안전을 위해 이 편지의 내용을 확인할 수 없어요.</p></section></FocusShell>;
+  if (letter.status === "withdrawn") return <FocusShell title="내가 보낸 편지" fallback="/mailbox"><section className="flow-message"><h1>이 편지는<br />조용히 거두었어요.</h1></section></FocusShell>;
+  return <main className="mobile-prototype letter-flow-screen letter-flow-screen--active-reader"><FlowHeader title="내가 보낸 편지" fallback="/mailbox" /><div className="letter-flow-scroll active-reading-scroll">
+    <section className="active-reading-room" aria-label="내가 보낸 편지 공간" style={{ minHeight: 248 }}>
+      <div className="active-reading-room-copy"><h1><strong>답장</strong>을<br />기다리고 있어요</h1></div>
+      <img src="/assets/reply-sent-lavender-envelope.png" alt="" aria-hidden="true" style={{ opacity: 1, bottom: 12 }} />
+    </section>
+    <p className="active-reading-kicker" style={{ margin: "0 0 14px", padding: "0 24px" }}><span>내가 보낸 편지</span><time>{formatDate(letter.createdAt)}</time></p>
+    <div className="active-reading-mat" style={{ marginTop: 0 }}>
+      <article className="active-reading-paper" style={{ minHeight: "auto", paddingBottom: 26 }}>
+        <span className="active-reading-quote active-reading-quote--open" aria-hidden="true" style={{ color: "rgba(41,37,34,0.6)" }}>“</span>
+        <blockquote style={{ minHeight: "auto" }}>{letter.content}</blockquote>
+        <span className="active-reading-quote active-reading-quote--close" aria-hidden="true" style={{ color: "rgba(41,37,34,0.6)" }}>”</span>
+        <p style={{ margin: "10px 0 0", textAlign: "right", color: "var(--muted-ink)", fontFamily: '"Noto Serif KR", serif', fontSize: "12px" }}>─ {signature}</p>
+      </article>
+    </div>
+  </div></main>;
 }
 
 export function RepliedLetterDetailScreen({ letterId }: { letterId?: string }) {
