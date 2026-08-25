@@ -160,7 +160,7 @@ function IntroScreen() {
     <ScreenShell className="intro-screen">
       <img
         className="intro-art"
-        src="/assets/intro-door.png"
+        src="/assets/intro-door-raised.png"
         alt="담쟁이덩굴이 감싼 보랏빛 현관문과 편지가 든 우편함"
       />
       <section className="intro-copy" aria-labelledby="intro-title">
