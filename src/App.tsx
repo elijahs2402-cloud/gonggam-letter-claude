@@ -94,6 +94,7 @@ import { MailboxUnifiedDraftA, MailboxUnifiedDraftB, MailboxUnifiedDraftC } from
 import { MailboxUnifiedVisualV1, MailboxUnifiedVisualV2, MailboxUnifiedVisualV3 } from "./MailboxUnifiedVisualDrafts";
 import { MailboxUnifiedIllustratedDraft } from "./MailboxUnifiedIllustratedDraft";
 import { ReplyArrivedDraftR1, ReplyArrivedDraftR2, ReplyArrivedDraftR3 } from "./ReplyArrivedDrafts";
+import { NicknameEntryScreen } from "./NicknameEntryScreen";
 
 type MoodChoice = "write" | "listen";
 
@@ -398,12 +399,13 @@ export function App() {
     if (next && next !== "/terms-consent") return <AuthGateRedirect to={next} />;
     return <TermsConsentScreen />;
   }
-  if (path === "/anonymous-name") {
+  if (path === "/nickname-entry") {
     const next = getRequiredOnboardingPath();
     const isMotionPreview = getCurrentAppSearchParams().get("motion") === "preview";
-    if (next && next !== "/anonymous-name" && !isMotionPreview) return <AuthGateRedirect to={next} />;
-    return <AnonymousNameScreen />;
+    if (next && next !== "/nickname-entry" && !isMotionPreview) return <AuthGateRedirect to={next} />;
+    return <NicknameEntryScreen />;
   }
+  if (path === "/nickname-entry-legacy") return <AnonymousNameScreen />;
   if (path === "/onboarding-complete") {
     if (!isMockAuthenticated()) return <AuthGateRedirect to={getRequiredOnboardingPath() ?? "/login"} />;
     return <AuthGateRedirect to="/home" />;

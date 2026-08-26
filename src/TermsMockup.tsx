@@ -142,7 +142,7 @@ export function TermsMockupScreen() {
         <button
           type="button"
           className="auth-primary"
-          onClick={() => navigateTo("/anonymous-name")}
+          onClick={() => navigateTo("/nickname-entry")}
         >
           동의하고 계속하기
         </button>

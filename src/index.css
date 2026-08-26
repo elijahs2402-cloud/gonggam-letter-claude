@@ -257,6 +257,7 @@ button:focus-visible {
 .auth-provider-button { min-height: 54px; position: relative; display: grid; place-items: center; border: 1px solid rgba(78,52,94,.36); background: rgba(255,255,255,.48); color: var(--ink); cursor: pointer; font-size: 13px; font-weight: 600; }
 .auth-provider-button:disabled { cursor: wait; opacity: .63; }
 .auth-provider-mark { position: absolute; left: 17px; color: var(--deep-plum); font-size: 17px; font-weight: 800; }
+.auth-provider-mark img { display: block; width: 24px; height: 24px; object-fit: contain; }
 .auth-provider-mark--google { color: #75689b; font-size: 16px; }
 .auth-provider-mark--kakao { width: 18px; height: 18px; display: grid; place-items: center; border: 1px solid var(--deep-plum); border-radius: 50%; font-size: 10px; }
 .auth-loading-copy { display: inline-flex; align-items: center; gap: 8px; }
@@ -294,6 +295,15 @@ button:focus-visible {
 .auth-dialog button { width: 100%; }
 @keyframes auth-dialog-in { from { opacity: 0; transform: translateY(6px) scale(.985); } to { opacity: 1; transform: none; } }
 .auth-intro-copy--name { padding-top: 8px; }
+
+/* Figma 시안 — 닉네임 만들기 비교 라우트 (/nickname-entry-figma) */
+.nef-screen { background-color: #f6f0e5; background-image: linear-gradient(rgba(246,240,229,.89), rgba(246,240,229,.89)), url("/assets/nickname-figma-bg.jpg"); background-position: top center; background-size: 100% auto; background-repeat: no-repeat; }
+.nef-scroll { display: flex; flex-direction: column; }
+.nef-intro h1 { font-size: 31px; line-height: 1.38; letter-spacing: -.065em; }
+.nef-field { margin-top: 42px; }
+.nef-label { display: block; margin-bottom: 0; color: var(--deep-plum); font-family: Pretendard, sans-serif; font-size: 14px; font-weight: 700; }
+.nef-suggest-wrap { margin-top: auto; padding: 24px 0 20px; text-align: center; }
+.nef-suggest-button { border: 0; border-bottom: 1px solid var(--deep-plum); background: transparent; padding: 5px 4px; color: var(--deep-plum); font-family: Pretendard, sans-serif; font-size: 14px; font-weight: 700; cursor: pointer; }
 .anonymous-name-intro-helper { margin-top: 16px; }
 .anonymous-name-field { margin-top: 42px; padding-top: 17px; border-top: 1px solid rgba(188,146,62,.54); }
 .anonymous-name-field > label { display: block; color: var(--deep-plum); font-family: Pretendard, sans-serif; font-size: 11px; font-weight: 700; letter-spacing: .02em; }

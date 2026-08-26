@@ -56,6 +56,7 @@ export function OnboardingScreen() {
 }
 
 const providerLabels: Record<MockAuthProvider, string> = { apple: "Apple로 계속하기", google: "Google로 계속하기", kakao: "카카오로 계속하기" };
+const loginScreenProviders: MockAuthProvider[] = ["apple", "google"];
 
 export function LoginScreen() {
   const [snapshot, setSnapshot] = useState(getMockAuthSnapshot);
@@ -99,14 +100,18 @@ export function LoginScreen() {
       </section>}
 
       <section className="auth-provider-list" aria-label="로그인 방법">
-        {(Object.keys(providerLabels) as MockAuthProvider[]).map((provider) => <button
+        {loginScreenProviders.map((provider) => <button
           key={provider}
           className="auth-provider-button"
           type="button"
           disabled={loggingIn}
           onClick={() => start(provider)}
         >
-          <span className={`auth-provider-mark auth-provider-mark--${provider}`} aria-hidden="true">{provider === "apple" ? "●" : provider === "google" ? "G" : "K"}</span>
+          <span className={`auth-provider-mark auth-provider-mark--${provider}`} aria-hidden="true">
+            {provider === "apple" ? <img src="/assets/logo_apple.png" alt="" />
+              : provider === "google" ? <img src="/assets/logo_google.png" alt="" />
+              : "K"}
+          </span>
           {loggingIn && snapshot.pendingProvider === provider ? <span className="auth-loading-copy"><i className="auth-spinner" />로그인하고 있어요.</span> : providerLabels[provider]}
         </button>)}
       </section>
@@ -153,7 +158,7 @@ export function TermsConsentScreen() {
       </section>
       <p className="terms-note">최종 정책 문서는 실제 서비스 개발 단계에서 연결됩니다.</p>
     </div>
-    <footer className="auth-actions"><button className="auth-primary" disabled={!allChecked} type="button" onClick={() => { acceptTerms(); navigateTo("/anonymous-name"); }}>동의하고 계속하기</button></footer>
+    <footer className="auth-actions"><button className="auth-primary" disabled={!allChecked} type="button" onClick={() => { acceptTerms(); navigateTo("/nickname-entry"); }}>동의하고 계속하기</button></footer>
     {openTerm && <div className="auth-dialog-backdrop" role="presentation"><section className="auth-dialog" role="dialog" aria-modal="true" aria-labelledby="term-dialog-title"><p>필수 확인</p><h2 id="term-dialog-title">{openTerm}</h2><span>최종 정책 문서는 실제 서비스 개발 단계에서 연결됩니다.</span><button className="auth-primary" type="button" onClick={() => setOpenTerm(undefined)}>닫기</button></section></div>}
   </AuthShell>;
 }
