@@ -1,4 +1,5 @@
 import { navigateTo, navigateBack } from "./navigation";
+import { acceptTerms } from "./mockAuth";
 
 const TERMS_SECTIONS = [
   {
@@ -142,7 +143,7 @@ export function TermsMockupScreen() {
         <button
           type="button"
           className="auth-primary"
-          onClick={() => navigateTo("/nickname-entry")}
+          onClick={() => { acceptTerms(); navigateTo("/nickname-entry"); }}
         >
           동의하고 계속하기
         </button>

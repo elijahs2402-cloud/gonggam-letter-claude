@@ -41,6 +41,7 @@ import { TermsMockupScreen } from "./TermsMockup";
 import { WaitingLettersListLabScreen } from "./WaitingLettersListLab";
 import { HomeScreen } from "./HomeScreen";
 import { MySpaceScreen } from "./MySpaceScreen";
+import { MySpaceDraft1, MySpaceDraft2, MySpaceDraft3 } from "./MySpaceDrafts";
 import {
   AssignLetterScreen,
   LetterPreviewScreen,
@@ -394,10 +395,11 @@ export function App() {
     if (isMockAuthenticated()) return <AuthGateRedirect to="/home" />;
     return <LoginScreen />;
   }
+  if (path === "/terms-consent-legacy") return <TermsConsentScreen />;
   if (path === "/terms-consent") {
     const next = getRequiredOnboardingPath();
     if (next && next !== "/terms-consent") return <AuthGateRedirect to={next} />;
-    return <TermsConsentScreen />;
+    return <TermsMockupScreen />;
   }
   if (path === "/nickname-entry") {
     const next = getRequiredOnboardingPath();
@@ -460,6 +462,9 @@ export function App() {
   if (path === "/letter-sent") return <LetterSentScreen letterId={getCurrentAppSearchParams().get("id") ?? undefined} />;
   if (path === "/prototype/letter-journey-lab") return <LetterJourneyLabScreen />;
   if (path === "/prototype/mailbox-list-lab") return <MailboxListLabScreen />;
+  if (path === "/prototype/my-space-draft-1") return <MySpaceDraft1 />;
+  if (path === "/prototype/my-space-draft-2") return <MySpaceDraft2 />;
+  if (path === "/prototype/my-space-draft-3") return <MySpaceDraft3 />;
   if (path === "/prototype/mailbox-mockup") return <MailboxMockupScreen />;
   if (path === "/prototype/mailbox-mockup-2") return <MailboxMockup2Screen />;
   if (path === "/prototype/mailbox-mockup-3") return <MailboxMockup3Screen />;
